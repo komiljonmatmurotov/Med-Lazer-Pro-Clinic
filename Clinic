@@ -1,0 +1,153 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bar } from "react-chartjs-2";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
+import logo from "@/assets/med-lazer-logo.png";
+import { motion } from "framer-motion";
+
+export default function MedLazerProApp() {
+  const [user, setUser] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [likes, setLikes] = useState(0);
+
+  const handleLogin = (role) => setUser(role);
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      setComments([...comments, newComment]);
+      setNewComment("");
+    }
+  };
+
+  const dummyData = {
+    revenue: [120000, 130000, 145000, 160000],
+    expenses: [90000, 95000, 100000, 110000],
+    doctors: [
+      { name: "Dr. X", patients: 40, income: 20000 },
+      { name: "Dr. Y", patients: 50, income: 27000 }
+    ]
+  };
+
+  const rentabilityData = {
+    labels: ["Yanvar", "Fevral", "Mart", "Aprel"],
+    datasets: [
+      {
+        label: "Tushum",
+        data: dummyData.revenue,
+        backgroundColor: "#4ade80"
+      },
+      {
+        label: "Chiqim",
+        data: dummyData.expenses,
+        backgroundColor: "#f87171"
+      }
+    ]
+  };
+
+  const doctorEfficiency = {
+    labels: dummyData.doctors.map((d) => d.name),
+    datasets: [
+      {
+        label: "Bemorlar soni",
+        data: dummyData.doctors.map((d) => d.patients),
+        backgroundColor: "#60a5fa"
+      }
+    ]
+  };
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-50 to-green-50 space-y-6 p-6">
+        <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 3 }}>
+          <Image src={logo} alt="Med Lazer Pro Logo" width={120} height={120} />
+        </motion.div>
+        <h1 className="text-3xl font-bold text-gray-800">Med Lazer Pro Klinikasi Hisobot Platformasi</h1>
+        <p className="text-gray-600">Iltimos, rolingizni tanlang:</p>
+        <div className="space-x-4">
+          <Button onClick={() => handleLogin("registrator")} className="bg-blue-500 hover:bg-blue-600">Registrator</Button>
+          <Button onClick={() => handleLogin("gaznachi")} className="bg-green-500 hover:bg-green-600">G'aznachi</Button>
+          <Button onClick={() => handleLogin("hamshira")} className="bg-yellow-500 hover:bg-yellow-600">Hamshira</Button>
+          <Button onClick={() => handleLogin("rahbar")} className="bg-red-500 hover:bg-red-600">Rahbar</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="flex items-center mb-6 space-x-4">
+        <Image src={logo} alt="Med Lazer Pro Logo" width={60} height={60} />
+        <h2 className="text-2xl font-bold text-blue-900">Xush kelibsiz, {user}</h2>
+      </div>
+      <Tabs defaultValue="dashboard">
+        <TabsList>
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="rentabellik">Rentabellik</TabsTrigger>
+          <TabsTrigger value="shifokorlar">Shifokorlar</TabsTrigger>
+          <TabsTrigger value="fikrlar">Fikrlar</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="dashboard">
+          <Card className="bg-white shadow-md rounded-xl">
+            <CardContent className="p-6">
+              <p className="text-lg font-semibold text-gray-800">Xususiy klinika: Med Lazer Pro</p>
+              <ul className="list-disc ml-6 mt-3 text-gray-700 space-y-1">
+                <li>Qulay joylashuv, bemorlar uchun comfort iqlim</li>
+                <li>Ambulator va statsionar xizmatlar</li>
+                <li>Hushmuomala, yuqori malakali tibbiyot hodimlari</li>
+                <li>Zamonaviy diagnostika va davolovchi uskunalar</li>
+                <li>10 yillik zamonaviy davolash usullari va texnologik jarrohlik amaliyotlari</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rentabellik">
+          <Card className="bg-white shadow-md rounded-xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Bo'limlar bo'yicha tushum va chiqim</h3>
+              <Bar data={rentabilityData} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="shifokorlar">
+          <Card className="bg-white shadow-md rounded-xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Shifokorlar samaradorligi</h3>
+              <Bar data={doctorEfficiency} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="fikrlar">
+          <Card className="bg-white shadow-md rounded-xl">
+            <CardContent className="p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Foydalanuvchilar fikrlari</h3>
+              <div className="space-y-2">
+                {comments.map((c, i) => (
+                  <p key={i} className="bg-gray-100 p-2 rounded-md text-gray-700">{c}</p>
+                ))}
+              </div>
+              <Textarea
+                placeholder="Fikringizni yozing..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <div className="flex items-center space-x-4">
+                <Button onClick={handleAddComment}>Yuborish</Button>
+                <Button onClick={() => setLikes(likes + 1)} className="bg-pink-500 hover:bg-pink-600 text-white">
+                  Layk ({likes})
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
